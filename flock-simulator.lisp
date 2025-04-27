@@ -5,8 +5,12 @@
 (defun display-canvas (frame pane)
   (with-bounding-rectangle* (x0 y0 x1 y1) pane
     (draw-rectangle* pane x0 y0 x1 y1 :ink +white+)
-    (dolist (boid (boids frame))
-      (draw boid pane :ink +red+))))
+    (with-drawing-options (pane :transformation (make-translation-transformation (/ (+ x0 x1) 2.0)
+                                                                                 (/ (+ y0 y1) 2.0)))
+      (draw-point* pane 0.0 0.0 :ink +red+ :line-thickness 25)
+      (dolist (boid (boids frame))
+        (draw boid pane :ink +blue+)
+        (update boid (boids frame))))))
 
 
 ;;; Sheets and events.
@@ -64,10 +68,14 @@
 (defmethod run-frame-top-level :before ((frame flock-simulator) &key &allow-other-keys)
   (let ((canvas (find-pane-named frame 'canvas)))
     (with-bounding-rectangle* (x0 y0 x1 y1) canvas
-      (setf (boids frame) (loop repeat 20
-                                collect (make-instance 'boid
-                                                       :location (3dv:vec2 (random (- x1 x0))
-                                                                           (random (- y1 y0)))))))))
+      (let ((width (- x1 x0))
+            (height (- y1 y0)))
+       (setf (boids frame) (loop repeat 20
+                                 collect (make-instance 'boid
+                                                        :location (3dv:vec2 (- (random (/ 2 width))
+                                                                               (/ 2 width))
+                                                                            (- (random (/ height 2))
+                                                                               (/ height 2))))))))))
 
 (defun start ()
   (find-application-frame 'flock-simulator))

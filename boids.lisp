@@ -28,9 +28,51 @@
                                           (3dv:vx p2) (3dv:vy p2))
                drawing-options)))))
 
+(defgeneric update (object boids))
 
-(defgeneric update (object))
+(defmethod update ((boid boid) boids)
+  (let ((max-velocity 50.0))
+    (with-accessors ((velocity velocity) (location location)) boid
+      (setf location (3dv:v+ location velocity)
+            velocity (3dv:vlimit (3dv:v+ velocity
+                                         (rule boid boids 1)
+                                         (rule boid boids 2)
+                                         ;;(rule boid boids 3)
+                                         )
+                                 max-velocity)))))
 
-(defmethod update ((boid boid))
-  (declare (ignore boid))
-  t)
+(defgeneric rule (object boids number))
+
+(defmethod rule ((boid boid) boids (number (eql 1)))
+  (declare (ignore number))
+  (loop with v-sum = (3dv:vec2)
+        for boid1 in boids
+        for offset = (3dv:v- (location boid) (location boid1))
+        for distance = (3dv:vlength offset)
+        if (and (not (eq boid boid1)) (< distance 10))
+          do (3dv:nv+ v-sum offset)
+        finally (return v-sum)))
+
+(defmethod rule ((boid boid) boids (number (eql 2)))
+  (declare (ignore number))
+  (loop with center = (3dv:vec2)
+        for boid1 in boids
+        if (not (eq boid boid1))
+          do (3dv:nv+ center (location boid1))
+        finally (3dv:nvscale center (/ (1- (length boids))))
+                (3dv:nv- center (location boid))
+                (3dv:nvscale center (/ 200.0))
+                (return center)))
+
+(defmethod rule ((boid boid) boids (number (eql 3)))
+  (declare (ignore number))
+  (loop with result = (3dv:vec2)
+        for boid1 in boids
+        if (not (eq boid boid1))
+          do (3dv:nv+ result (velocity boid1))
+        finally (let ((rl (3dv:vlength result)))
+                  (unless (zerop rl)
+                    (3dv:nvscale result (/ (1- (length boids))))
+                    (3dv:nv- result (velocity boid))
+                    (3dv:nvscale result (/ 8.0)))
+                  (return result))))

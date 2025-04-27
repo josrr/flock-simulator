@@ -4,13 +4,16 @@
 
 (defun display-canvas (frame pane)
   (with-bounding-rectangle* (x0 y0 x1 y1) pane
-    (draw-rectangle* pane x0 y0 x1 y1 :ink +white+)
+    ;;(draw-rectangle* pane x0 y0 x1 y1 :ink +white+)
     (with-drawing-options (pane :transformation (make-translation-transformation (/ (+ x0 x1) 2.0)
                                                                                  (/ (+ y0 y1) 2.0)))
       (draw-point* pane 0.0 0.0 :ink +red+ :line-thickness 25)
       (dolist (boid (boids frame))
-        (draw boid pane :ink +blue+)
-        (update boid (boids frame))))))
+        (draw boid pane :ink +blue+))
+      (dolist (boid (boids frame))
+        (update-location boid (boids frame)))
+      (dolist (boid (boids frame))
+        (update-velocity boid (boids frame))))))
 
 
 ;;; Sheets and events.
@@ -70,11 +73,11 @@
     (with-bounding-rectangle* (x0 y0 x1 y1) canvas
       (let ((width (- x1 x0))
             (height (- y1 y0)))
-       (setf (boids frame) (loop repeat 20
+       (setf (boids frame) (loop repeat 40
                                  collect (make-instance 'boid
-                                                        :location (3dv:vec2 (- (random (/ 2 width))
-                                                                               (/ 2 width))
-                                                                            (- (random (/ height 2))
+                                                        :location (3dv:vec2 (- (random width)
+                                                                               (/ width 2))
+                                                                            (- (random height)
                                                                                (/ height 2))))))))))
 
 (defun start ()

@@ -11,7 +11,7 @@
         (dolist (boid (boids frame))
           (draw boid pane :ink +blue+))
         (dolist (boid (boids frame))
-          (update-location boid (boids frame)))
+          (update-location boid))
         (dolist (boid (boids frame))
           (update-velocity boid (boids frame) (3dv:v- (destination frame) (3dv:vec2 dx dy))))))))
 

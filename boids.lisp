@@ -28,11 +28,11 @@
                                           (3dv:vx p2) (3dv:vy p2))
                drawing-options)))))
 
-(defgeneric update-location (object boids))
+(defgeneric update-location (object))
 (defgeneric update-velocity (object boids destination))
 (defgeneric rule (object boids number))
 
-(defmethod update-location ((boid boid) boids)
+(defmethod update-location ((boid boid))
   (setf (location boid) (3dv:v+ (location boid) (velocity boid))))
 
 (defparameter *max-velocity* 10.0)

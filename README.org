@@ -19,18 +19,6 @@ Boids algorithm
 #+ATTR_HTML: :class img-responsive centered
 [[./001.png]]
 
-#+NAME:   fig:sc01
-#+ATTR_HTML: :class img-responsive centered
-[[./002.png]]
-
-#+NAME:   fig:sc01
-#+ATTR_HTML: :class img-responsive centered
-[[./003.png]]
-
-#+NAME:   fig:sc01
-#+ATTR_HTML: :class img-responsive centered
-[[./004.png]]
-
 * How to run the program
 
 To run the program, clone [[https://github.com/josrr/clim-hexgrids][this]] repository in your Quicklisp
@@ -45,7 +33,7 @@ then:
 
 #+BEGIN_SRC
  $ sbcl
- This is SBCL 2.3.11, an implementation of ANSI Common Lisp.
+ This is SBCL 2.5.3, an implementation of ANSI Common Lisp.
  More information about SBCL is available at <http://www.sbcl.org/>.
 
  SBCL is free software, provided as is, with absolutely no warranty.
@@ -54,16 +42,18 @@ then:
  distribution for more information.
  * (ql:register-local-projects)
  NIL
- * (ql:quickload "clim-hexgrids")
- To load "clim-hexgrids":
-   Load 1 ASDF system:
-     clim-hexgrids
- ; Loading "clim-hexgrids"
- ..................................................
- ..................................................
- [package clim-hexgrids]......
- ("clim-hexgrids")
- * (clim-hexgrids:start)
- #<CLIM-HEXGRIDS::HEXGRIDS {10099059B3}>
- *
+ * (ql:quickload "flock-simulator")
+To load "flock-simulator":
+  Load 1 ASDF system:
+    flock-simulator
+; Loading "flock-simulator"
+....
+;; Using FAKE-PROGV-KLUDGE for SBCL.
+..............................................
+.....................
+("flock-simulator")
+* (flock-simulator:start)
+#<FLOCK-SIMULATOR::FLOCK-SIMULATOR {1008C58753}>
 #+END_SRC
+
+lastly, click the application pane.

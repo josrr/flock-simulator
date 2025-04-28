@@ -17,7 +17,7 @@ Boids algorithm
 
 #+NAME:   fig:sc01
 #+ATTR_HTML: :class img-responsive centered
-[[./flock-simulator.webm]]
+[[./flock-simulator.gif]]
 
 * How to run the program
 

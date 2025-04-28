@@ -4,16 +4,16 @@
 
 (defun display-canvas (frame pane)
   (with-bounding-rectangle* (x0 y0 x1 y1) pane
-    ;;(draw-rectangle* pane x0 y0 x1 y1 :ink +white+)
-    (with-drawing-options (pane :transformation (make-translation-transformation (/ (+ x0 x1) 2.0)
-                                                                                 (/ (+ y0 y1) 2.0)))
-      (draw-point* pane 0.0 0.0 :ink +red+ :line-thickness 25)
-      (dolist (boid (boids frame))
-        (draw boid pane :ink +blue+))
-      (dolist (boid (boids frame))
-        (update-location boid (boids frame)))
-      (dolist (boid (boids frame))
-        (update-velocity boid (boids frame))))))
+    (let ((dx (/ (+ x0 x1) 2.0))
+          (dy (/ (+ y0 y1) 2.0)))
+      (with-drawing-options (pane :transformation (make-translation-transformation dx dy))
+        (draw-point* pane 0.0 0.0 :ink +red+ :line-thickness 25)
+        (dolist (boid (boids frame))
+          (draw boid pane :ink +blue+))
+        (dolist (boid (boids frame))
+          (update-location boid (boids frame)))
+        (dolist (boid (boids frame))
+          (update-velocity boid (boids frame) (3dv:v- (destination frame) (3dv:vec2 dx dy))))))))
 
 
 ;;; Sheets and events.
@@ -33,7 +33,7 @@
   (setf (pulse-running-p pane)
         (not (pulse-running-p pane)))
   (when (pulse-running-p pane)
-    (clime:schedule-pulse-event pane :boom 0.001))
+    (clime:schedule-pulse-event pane :boom (/ 60.0)))
   (format *debug-io* "pulse-running-p: ~a~%" (pulse-running-p pane)))
 
 (defun handle-pulse (pane)
@@ -48,6 +48,10 @@
 (defmethod handle-event ((self canvas-pane) (event pointer-button-press-event))
   (toggle-pulse self))
 
+(defmethod handle-event ((self canvas-pane) (event pointer-motion-event))
+  (with-application-frame (frame)
+    (setf (destination frame) (3dv:vec2 (pointer-event-x event) (pointer-event-y event)))))
+
 (defmethod compose-space ((self canvas-pane) &key width height)
   (declare (ignore width height))
   (make-space-requirement :width 200 :height 200))
@@ -55,7 +59,8 @@
 
 ;;; Application frame
 (define-application-frame flock-simulator ()
-  ((boids :initarg :boids :initform nil :accessor boids))
+  ((boids :initarg :boids :initform nil :accessor boids)
+   (destination :initform (3dv:vec2 0.0 0.0) :accessor destination))
   (:panes (canvas (make-pane 'canvas-pane
                              :name 'canvas
                              :background +white+))
@@ -73,12 +78,26 @@
     (with-bounding-rectangle* (x0 y0 x1 y1) canvas
       (let ((width (- x1 x0))
             (height (- y1 y0)))
-       (setf (boids frame) (loop repeat 40
+       (setf (boids frame) (loop repeat 50
                                  collect (make-instance 'boid
                                                         :location (3dv:vec2 (- (random width)
                                                                                (/ width 2))
                                                                             (- (random height)
                                                                                (/ height 2))))))))))
+
+(define-flock-simulator-command (com-reset :name "Reset" :menu t) ()
+  (with-application-frame (frame)
+    (let ((canvas (find-pane-named frame 'canvas)))
+      (with-bounding-rectangle* (x0 y0 x1 y1) canvas
+        (let ((width (- x1 x0))
+              (height (- y1 y0)))
+          (setf (boids frame) (loop repeat 50
+                                    collect (make-instance 'boid
+                                                           :location (3dv:vec2 (- (random width)
+                                                                                  (/ width 2))
+                                                                               (- (random height)
+                                                                                  (/ height 2))))))))
+      (setf (pane-needs-redisplay canvas) t))))
 
 (defun start ()
   (find-application-frame 'flock-simulator))

@@ -29,21 +29,23 @@
                drawing-options)))))
 
 (defgeneric update-location (object boids))
-(defgeneric update-velocity (object boids))
+(defgeneric update-velocity (object boids destination))
 (defgeneric rule (object boids number))
 
 (defmethod update-location ((boid boid) boids)
-  (with-accessors ((velocity velocity) (location location)) boid
-    (setf location (3dv:v+ location velocity))))
+  (setf (location boid) (3dv:v+ (location boid) (velocity boid))))
 
-(defmethod update-velocity ((boid boid) boids)
-  (let ((max-velocity 10.0))
-    (with-accessors ((velocity velocity) (location location)) boid
-      (setf velocity (3dv:vlimit (3dv:v+ velocity
-                                         (rule boid boids 1)
-                                         (rule boid boids 2)
-                                         (rule boid boids 3))
-                                 max-velocity)))))
+(defparameter *max-velocity* 10.0)
+
+(defmethod update-velocity ((boid boid) boids destination)
+  (with-accessors ((velocity velocity)) boid
+    (setf velocity (3dv:vlimit (3dv:v+ velocity
+                                       (rule boid boids 1)
+                                       (rule boid boids 2)
+                                       (rule boid boids 3)
+                                       (3dv:vscale (3dv:v- destination (location boid))
+                                                   0.9))
+                               *max-velocity*))))
 
 (defmethod rule ((boid boid) boids (number (eql 1)))
   (declare (ignore number))
@@ -53,9 +55,7 @@
         for distance = (3dv:vlength offset)
         if (and (not (eq boid boid1)) (< distance 10))
           do (3dv:nv+ v-sum offset)
-        finally (return (if (zerop (3dv:vlength v-sum))
-                            v-sum
-                            (3dv:nvscale v-sum (/ 1.0))))))
+        finally (return v-sum)))
 
 (defmethod rule ((boid boid) boids (number (eql 2)))
   (declare (ignore number))
@@ -65,7 +65,7 @@
           do (3dv:nv+ center (location boid1))
         finally (3dv:nvscale center (/ (1- (length boids))))
                 (3dv:nv- center (location boid))
-                (3dv:nvscale center (/ 5.0))
+                (3dv:nvscale center (/ 3.0))
                 (return center)))
 
 (defmethod rule ((boid boid) boids (number (eql 3)))
@@ -78,9 +78,5 @@
                   (unless (zerop rl)
                     (3dv:nvscale result (/ (1- (length boids))))
                     (3dv:nv- result (velocity boid))
-                    (3dv:nvscale result (/ 8.0)))
+                    (3dv:nvscale result (/ 4.0)))
                   (return result))))
-
-(defmethod rule ((boid boid) boids (number (eql 3)))
-  (declare (ignore number))
-  (3dv:vec2))

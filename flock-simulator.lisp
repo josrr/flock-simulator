@@ -73,31 +73,26 @@
   (:menu-bar t)
   (:reinitialize-frames t))
 
-(defmethod run-frame-top-level :before ((frame flock-simulator) &key &allow-other-keys)
+(defun create-boids (frame &optional redisplayp)
   (let ((canvas (find-pane-named frame 'canvas)))
     (with-bounding-rectangle* (x0 y0 x1 y1) canvas
       (let ((width (- x1 x0))
             (height (- y1 y0)))
-       (setf (boids frame) (loop repeat 50
-                                 collect (make-instance 'boid
-                                                        :location (3dv:vec2 (- (random width)
-                                                                               (/ width 2))
-                                                                            (- (random height)
-                                                                               (/ height 2))))))))))
+        (setf (boids frame) (loop repeat 50
+                                  collect (make-instance 'boid
+                                                         :location (3dv:vec2 (- (random width)
+                                                                                (/ width 2))
+                                                                             (- (random height)
+                                                                                (/ height 2))))))))
+    (when redisplayp
+      (setf (pane-needs-redisplay (find-pane-named frame 'canvas)) t))))
+
+(defmethod run-frame-top-level :before ((frame flock-simulator) &key &allow-other-keys)
+  (create-boids frame))
 
 (define-flock-simulator-command (com-reset :name "Reset" :menu t) ()
   (with-application-frame (frame)
-    (let ((canvas (find-pane-named frame 'canvas)))
-      (with-bounding-rectangle* (x0 y0 x1 y1) canvas
-        (let ((width (- x1 x0))
-              (height (- y1 y0)))
-          (setf (boids frame) (loop repeat 50
-                                    collect (make-instance 'boid
-                                                           :location (3dv:vec2 (- (random width)
-                                                                                  (/ width 2))
-                                                                               (- (random height)
-                                                                                  (/ height 2))))))))
-      (setf (pane-needs-redisplay canvas) t))))
+    (create-boids frame t)))
 
 (defun start ()
   (find-application-frame 'flock-simulator))

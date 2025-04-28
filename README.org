@@ -17,11 +17,11 @@ Boids algorithm
 
 #+NAME:   fig:sc01
 #+ATTR_HTML: :class img-responsive centered
-[[./001.png]]
+[[./flock-simulator.webm]]
 
 * How to run the program
 
-To run the program, clone [[https://github.com/josrr/clim-hexgrids][this]] repository in your Quicklisp
+To run the program, clone [[https://github.com/josrr/flock-simulator][this]] repository in your Quicklisp
 =local-projects= directory
 
 #+BEGIN_SRC

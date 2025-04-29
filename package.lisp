@@ -1,4 +1,5 @@
 ;;;; package.lisp
+;;;; Copyright 2025 José M. Á. Ronquillo Rivera
 
 (defpackage #:flock-simulator
   (:use #:clim #:clim-lisp)

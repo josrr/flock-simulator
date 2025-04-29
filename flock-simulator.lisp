@@ -1,4 +1,5 @@
 ;;;; flock-simulator.lisp
+;;;; Copyright 2025 José M. Á. Ronquillo Rivera
 
 (in-package #:flock-simulator)
 

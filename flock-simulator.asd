@@ -1,4 +1,5 @@
 ;;;; flock-simulator.asd
+;;;; Copyright 2025 José M. Á. Ronquillo Rivera
 
 (asdf:defsystem #:flock-simulator
   :description "Describe flock-simulator here"

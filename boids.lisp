@@ -44,7 +44,7 @@
                                        (rule boid boids 1)
                                        (rule boid boids 2)
                                        (rule boid boids 3)
-                                       (3dv:vscale (3dv:v- destination (location boid)) 0.5))
+                                       (3dv:vscale (3dv:v- destination (location boid)) 0.8))
                                *max-velocity*))))
 
 (defmethod rule ((boid boid) boids (number (eql 1)))
@@ -73,6 +73,6 @@
         for boid1 in boids
         if (not (eq boid boid1))
           do (3dv:nv+ result (velocity boid1))
-        finally (return (3dv:nv/ (3dv:v- (3dv:nv/ result (1- (length boids)))
-                                         (velocity boid))
+        finally (return (3dv:nv/ (3dv:nv- (3dv:nv/ result (1- (length boids)))
+                                          (velocity boid))
                                  10.0))))

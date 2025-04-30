@@ -63,9 +63,9 @@
         for boid1 in boids
         if (not (eq boid boid1))
           do (3dv:nv+ center (location boid1))
-        finally (return (3dv:nv* (3dv:nv- (3dv:nv* center (/ (1- (length boids))))
+        finally (return (3dv:nv/ (3dv:nv- (3dv:nv/ center (1- (length boids)))
                                           (location boid))
-                                 (/ 200.0)))))
+                                 200.0))))
 
 (defmethod rule ((boid boid) boids (number (eql 3)))
   (declare (ignore number))
@@ -73,6 +73,6 @@
         for boid1 in boids
         if (not (eq boid boid1))
           do (3dv:nv+ result (velocity boid1))
-        finally (return (3dv:nv* (3dv:v- (3dv:nv* result (/ (1- (length boids))))
+        finally (return (3dv:nv/ (3dv:v- (3dv:nv/ result (1- (length boids)))
                                          (velocity boid))
-                                 (/ 10.0)))))
+                                 10.0))))

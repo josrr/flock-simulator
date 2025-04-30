@@ -5,7 +5,7 @@
 
 (defclass boid ()
   ((location :initarg :location :accessor location)
-   (velocity :initarg :velocity :initform (3dv:vec2) :accessor velocity)))
+   (velocity :initarg :velocity :initform (3dv:vec2 (random 10.0) (random 10.0)) :accessor velocity)))
 
 (defgeneric draw (object &optional pane &rest drawing-options))
 
@@ -44,18 +44,17 @@
                                        (rule boid boids 1)
                                        (rule boid boids 2)
                                        (rule boid boids 3)
-                                       (3dv:vscale (3dv:v- destination (location boid))
-                                                   0.9))
+                                       (3dv:vscale (3dv:v- destination (location boid)) 0.5))
                                *max-velocity*))))
 
 (defmethod rule ((boid boid) boids (number (eql 1)))
   (declare (ignore number))
   (loop with v-sum = (3dv:vec2)
         for boid1 in boids
-        for offset = (3dv:v- (location boid) (location boid1))
+        for offset = (3dv:v- (location boid1) (location boid))
         for distance = (3dv:vlength offset)
-        if (and (not (eq boid boid1)) (< distance 10))
-          do (3dv:nv+ v-sum offset)
+        if (and (not (eq boid boid1)) (< distance 20.0))
+          do (3dv:nv- v-sum offset)
         finally (return v-sum)))
 
 (defmethod rule ((boid boid) boids (number (eql 2)))
@@ -64,10 +63,9 @@
         for boid1 in boids
         if (not (eq boid boid1))
           do (3dv:nv+ center (location boid1))
-        finally (3dv:nvscale center (/ (1- (length boids))))
-                (3dv:nv- center (location boid))
-                (3dv:nvscale center (/ 3.0))
-                (return center)))
+        finally (return (3dv:nv* (3dv:nv- (3dv:nv* center (/ (1- (length boids))))
+                                          (location boid))
+                                 (/ 200.0)))))
 
 (defmethod rule ((boid boid) boids (number (eql 3)))
   (declare (ignore number))
@@ -75,9 +73,6 @@
         for boid1 in boids
         if (not (eq boid boid1))
           do (3dv:nv+ result (velocity boid1))
-        finally (let ((rl (3dv:vlength result)))
-                  (unless (zerop rl)
-                    (3dv:nvscale result (/ (1- (length boids))))
-                    (3dv:nv- result (velocity boid))
-                    (3dv:nvscale result (/ 4.0)))
-                  (return result))))
+        finally (return (3dv:nv* (3dv:v- (3dv:nv* result (/ (1- (length boids))))
+                                         (velocity boid))
+                                 (/ 10.0)))))

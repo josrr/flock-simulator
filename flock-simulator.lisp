@@ -10,11 +10,11 @@
       (with-drawing-options (pane :transformation (make-translation-transformation dx dy))
         (draw-point* pane 0.0 0.0 :ink +red+ :line-thickness 25)
         (dolist (boid (boids frame))
-          (draw boid pane :ink +blue+))
-        (dolist (boid (boids frame))
-          (update-location boid))
-        (dolist (boid (boids frame))
-          (update-velocity boid (boids frame) (3dv:v- (destination frame) (3dv:vec2 dx dy))))))))
+          (draw boid pane :ink +blue+)))
+      (dolist (boid (boids frame))
+        (update-velocity boid (boids frame) (3dv:v- (destination frame) (3dv:vec2 dx dy))))
+      (dolist (boid (boids frame))
+        (update-location boid)))))
 
 
 ;;; Sheets and events.

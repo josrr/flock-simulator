@@ -17,13 +17,13 @@
                             (3dv:vec2 0.0 -1.0)
                             (3dv:v/ velocity (3dv:v2norm velocity))))
              (p0 (3dv:v+ location
-                         (3dv:vscale direction (/ boid-length 2.0))))
+                         (3dv:v* direction boid-length 0.5)))
              (p1 (3dv:v+ location
-                         (3dv:vscale direction (- (/ boid-length 2.0)))
-                         (3dv:vscale (3dv:vrot2 direction (/ pi 2)) (/ boid-width 2.0))))
+                         (3dv:v* direction boid-length -0.5)
+                         (3dv:v* (3dv:vrot2 direction (/ pi 2)) boid-width 0.5)))
              (p2 (3dv:v+ location
-                         (3dv:vscale direction (- (/ boid-length 2.0)))
-                         (3dv:vscale (3dv:vrot2 direction (/ pi -2)) (/ boid-width 2.0)))))
+                         (3dv:v* direction boid-length -0.5)
+                         (3dv:v* (3dv:vrot2 direction (/ pi -2)) boid-width 0.5))))
         (apply #'draw-polygon* pane (list (3dv:vx p0) (3dv:vy p0)
                                           (3dv:vx p1) (3dv:vy p1)
                                           (3dv:vx p2) (3dv:vy p2))
